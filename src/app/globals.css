@@ -1,26 +1,242 @@
+/* ─── Google Fonts ─── */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap');
+
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ═══════════════════════════════════════════════════════════
+   NXT FITNESS STUDIO — GLOBAL DESIGN SYSTEM
+   Concept: CAUTION ZONE — Industrial Warning × Cinematic Dark
+   ═══════════════════════════════════════════════════════════ */
 
+/* ─── Tailwind v4 Theme Tokens ─── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Colors */
+  --color-bg-primary: #080808;
+  --color-bg-surface: #111111;
+  --color-bg-card: #1A1A1A;
+  --color-accent: #F5C400;
+  --color-accent-dim: #C49A00;
+  --color-accent-orange: #FF6B00;
+  --color-text-primary: #F0F0F0;
+  --color-text-muted: #666666;
+  --color-glass-yellow: rgba(245, 196, 0, 0.05);
+  --color-glass-border: rgba(245, 196, 0, 0.15);
+
+  /* Fonts */
+  --font-hero: 'Bebas Neue', sans-serif;
+  --font-heading: 'Anton', sans-serif;
+  --font-label: 'Space Mono', monospace;
+  --font-body: 'Inter', sans-serif;
+
+  /* Spacing */
+  --spacing-section: clamp(80px, 12vw, 160px);
+  --container-max: 1400px;
+  --container-padding: clamp(20px, 5vw, 80px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── CSS Custom Properties ─── */
+:root {
+  --bg-primary: #080808;
+  --bg-surface: #111111;
+  --bg-card: #1A1A1A;
+  --accent: #F5C400;
+  --accent-dim: #C49A00;
+  --accent-orange: #FF6B00;
+  --text-primary: #F0F0F0;
+  --text-muted: #666666;
+  --glass-yellow: rgba(245, 196, 0, 0.05);
+  --glass-border: rgba(245, 196, 0, 0.15);
+
+  /* Border tokens */
+  --card-border: 1px solid rgba(245, 196, 0, 0.12);
+  --card-border-hover: 1px solid rgba(245, 196, 0, 0.6);
+  --glow-yellow: 0 0 40px rgba(245, 196, 0, 0.25), 0 0 80px rgba(245, 196, 0, 0.1);
+
+  /* Typography sizes */
+  --size-hero: clamp(72px, 14vw, 200px);
+  --size-h2: clamp(40px, 6vw, 96px);
+  --size-label: 11px;
+  --tracking-hero: 0.02em;
+  --tracking-label: 0.2em;
+}
+
+/* ─── Base Resets ─── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  cursor: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* ─── Custom Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #F5C400;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #C49A00;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #F5C400 #111;
+}
+
+/* ─── Selection ─── */
+::selection {
+  background: rgba(245, 196, 0, 0.3);
+  color: #F0F0F0;
+}
+
+/* ─── Utility Classes ─── */
+.warning-stripes {
+  background: repeating-linear-gradient(
+    45deg,
+    #F5C400 0px,
+    #F5C400 8px,
+    transparent 8px,
+    transparent 16px
+  );
+}
+
+.text-gradient-yellow {
+  background: linear-gradient(135deg, #F5C400, #FF6B00);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ─── Focus States (Accessibility) ─── */
+*:focus-visible {
+  outline: 2px solid #F5C400;
+  outline-offset: 2px;
+}
+
+/* ─── Link Resets ─── */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ─── Noise Texture Overlay ─── */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0.03;
+}
+
+/* ─── Section Container ─── */
+.section-container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding-left: var(--container-padding);
+  padding-right: var(--container-padding);
+}
+
+/* ─── Image hover ─── */
+.img-hover-zoom {
+  overflow: hidden;
+}
+
+.img-hover-zoom img {
+  transition: transform 0.6s ease;
+}
+
+.img-hover-zoom:hover img {
+  transform: scale(1.03);
+}
+
+/* ─── Responsive cursor fallback ─── */
+@media (max-width: 768px) {
+  body {
+    cursor: auto;
+  }
+}
+
+@media (hover: none) {
+  body {
+    cursor: auto;
+  }
+}
+
+/* ─── Blinking cursor animation ─── */
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.cursor-blink::after {
+  content: '█';
+  animation: blink 1s infinite;
+  color: var(--accent);
+  font-size: 0.8em;
+  margin-left: 2px;
+}
+
+/* ─── Yellow glow pulse ─── */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 40px rgba(245, 196, 0, 0.25), 0 0 80px rgba(245, 196, 0, 0.1); }
+  50% { box-shadow: 0 0 60px rgba(245, 196, 0, 0.4), 0 0 100px rgba(245, 196, 0, 0.2); }
+}
+
+.glow-pulse {
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+/* ─── Marquee animation ─── */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marquee-reverse {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+/* ─── Button hover fill ─── */
+.yellow-button:hover .btn-hover-fill {
+  transform: translateX(0) !important;
+}
+
+/* ─── Footer responsive ─── */
+@media (max-width: 768px) {
+  .footer-columns {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ─── Instagram grid responsive ─── */
+@media (max-width: 768px) {
+  .ig-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
