@@ -32,13 +32,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "NXT Fitness Studio | Chennai's #1 Private Gym",
+  title: "xyz Fitness Studio | Chennai's #1 Private Gym",
   description:
     "Train harder. Get results. NXT Fitness Studio is Chennai's most serious private training studio with expert coaches, premium equipment, and proven transformation programs.",
   keywords:
     "gym Chennai, private gym Chennai, personal trainer Chennai, fitness studio Chennai, weight loss Chennai, NXT Fitness",
   openGraph: {
-    title: "NXT Fitness Studio | Chennai's Premier Private Gym",
+    title: "xyz Fitness Studio | Chennai's Premier Private Gym",
     description:
       "Train at Chennai's most serious private gym. Expert coaches, premium equipment, proven transformations.",
     url: "https://www.nxtfitnessstudio.com",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "NXT Fitness Studio | Chennai's #1 Private Gym",
+    title: "xyz Fitness Studio | Chennai's #1 Private Gym",
     description:
       "Chennai's most serious private training studio. Expert coaches, premium equipment, proven results.",
   },
