@@ -70,6 +70,9 @@ export default function RootLayout({
     >
       <head>
         <link rel="canonical" href="https://www.nxtfitnessstudio.com" />
+        <link rel="dns-prefetch" href="https://wa.me" />
+        <meta name="theme-color" content="#080808" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
       </head>
       <body
         style={{

@@ -1,14 +1,10 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { useGSAP } from '@gsap/react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useDeviceAnimations } from '@/hooks/useDeviceAnimations';
 import SectionLabel from '@/components/ui/SectionLabel';
 import DiamondBadge from '@/components/ui/DiamondBadge';
-
-gsap.registerPlugin(ScrollTrigger);
 
 const faqs = [
   { q: 'What are your gym timings?', a: "We're open Monday to Saturday, 6:00 AM to 10:00 PM, and Sunday 7:00 AM to 2:00 PM." },
@@ -24,32 +20,14 @@ const faqs = [
 export default function FAQ() {
   const sectionRef = useRef<HTMLElement>(null);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-  useGSAP(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        '.faq-left > *',
-        { y: 40, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          stagger: 0.1,
-          ease: 'power2.out',
-          scrollTrigger: { trigger: sectionRef.current, start: 'top 75%' },
-        }
-      );
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, { scope: sectionRef });
+  const { isMobile, isTouch } = useDeviceAnimations();
 
   return (
     <section
       ref={sectionRef}
       id="faq"
       style={{
-        padding: 'clamp(80px, 10vw, 140px) clamp(20px, 8vw, 120px)',
+        padding: 'clamp(80px, 10vw, 140px) clamp(20px, 5vw, 80px)',
         background: '#0A0A0A',
       }}
     >
@@ -58,20 +36,26 @@ export default function FAQ() {
           maxWidth: 1400,
           margin: '0 auto',
           display: 'grid',
-          gridTemplateColumns: '40% 60%',
-          gap: 80,
+          gridTemplateColumns: isMobile ? '1fr' : '40% 60%',
+          gap: isMobile ? 40 : 80,
         }}
         className="faq-grid"
       >
         {/* Left */}
-        <div className="faq-left">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
+          className="faq-left"
+        >
           <div style={{ marginBottom: 24 }}>
             <SectionLabel index="08" label="FAQ" />
           </div>
           <h2
             style={{
               fontFamily: "var(--font-heading)",
-              fontSize: 'clamp(40px, 5vw, 72px)',
+              fontSize: 'clamp(36px, 5vw, 72px)',
               color: '#F0F0F0',
               lineHeight: 1.05,
               marginBottom: 20,
@@ -82,7 +66,7 @@ export default function FAQ() {
           <p
             style={{
               fontFamily: "var(--font-body)",
-              fontSize: 16,
+              fontSize: 15,
               color: '#666',
               lineHeight: 1.6,
               marginBottom: 32,
@@ -93,10 +77,15 @@ export default function FAQ() {
           <DiamondBadge size="lg" style={{ opacity: 0.8 }}>
             ?
           </DiamondBadge>
-        </div>
+        </motion.div>
 
         {/* Right — Accordion */}
-        <div>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          viewport={{ once: true }}
+        >
           {faqs.map((faq, i) => (
             <div
               key={i}
@@ -114,20 +103,22 @@ export default function FAQ() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  padding: '20px 0',
+                  padding: '24px 0',
+                  minHeight: 48,
                   background: 'none',
                   border: 'none',
-                  cursor: 'none',
+                  cursor: isTouch ? 'pointer' : 'none',
                   textAlign: 'left',
                 }}
               >
                 <span
                   style={{
                     fontFamily: "var(--font-body)",
-                    fontSize: 17,
+                    fontSize: isMobile ? 15 : 17,
                     fontWeight: 600,
-                    color: '#F0F0F0',
+                    color: openIndex === i ? '#F5C400' : '#F0F0F0',
                     paddingRight: 16,
+                    transition: 'color 0.3s ease',
                   }}
                 >
                   {faq.q}
@@ -160,10 +151,10 @@ export default function FAQ() {
                     <p
                       style={{
                         fontFamily: "var(--font-body)",
-                        fontSize: 15,
-                        color: '#777',
+                        fontSize: isMobile ? 14 : 15,
+                        color: '#999',
                         lineHeight: 1.8,
-                        padding: '0 0 20px',
+                        padding: '0 0 24px',
                       }}
                     >
                       {faq.a}
@@ -173,17 +164,8 @@ export default function FAQ() {
               </AnimatePresence>
             </div>
           ))}
-        </div>
+        </motion.div>
       </div>
-
-      <style jsx>{`
-        @media (max-width: 768px) {
-          .faq-grid {
-            grid-template-columns: 1fr !important;
-            gap: 40px !important;
-          }
-        }
-      `}</style>
     </section>
   );
 }

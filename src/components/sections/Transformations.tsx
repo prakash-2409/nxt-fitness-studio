@@ -1,15 +1,11 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { useGSAP } from '@gsap/react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useDeviceAnimations } from '@/hooks/useDeviceAnimations';
 import SectionLabel from '@/components/ui/SectionLabel';
 import GlassCard from '@/components/ui/GlassCard';
 import YellowButton from '@/components/ui/YellowButton';
-
-gsap.registerPlugin(ScrollTrigger);
 
 const transformations = [
   { id: 1, name: 'Rahul M.', duration: '3 MONTHS', stat: '-14kg', direction: 'down', trainer: 'Coach Vikram', category: '3m' },
@@ -30,32 +26,11 @@ const filters = [
 export default function Transformations() {
   const sectionRef = useRef<HTMLElement>(null);
   const [activeFilter, setActiveFilter] = useState('all');
+  const { isMobile, isTouch } = useDeviceAnimations();
 
   const filtered = activeFilter === 'all'
     ? transformations
     : transformations.filter((t) => t.category === activeFilter);
-
-  useGSAP(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        '.transform-heading > *',
-        { y: 40, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          stagger: 0.12,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 75%',
-          },
-        }
-      );
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, { scope: sectionRef });
 
   return (
     <section
@@ -68,30 +43,43 @@ export default function Transformations() {
     >
       <div className="section-container">
         {/* Header */}
-        <div className="transform-heading" style={{ textAlign: 'center', marginBottom: 48 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
+          className="transform-heading"
+          style={{ textAlign: isMobile ? 'left' : 'center', marginBottom: 48 }}
+        >
           <div style={{ marginBottom: 24 }}>
             <SectionLabel index="04" label="TRANSFORMATIONS" />
           </div>
           <h2
             style={{
               fontFamily: "var(--font-heading)",
-              fontSize: 'clamp(40px, 6vw, 80px)',
+              fontSize: 'clamp(36px, 6vw, 80px)',
               lineHeight: 1.05,
               color: '#F0F0F0',
               marginBottom: 16,
             }}
           >
             REAL PEOPLE.
-            <br />
+            {isMobile ? ' ' : <br />}
             <span style={{ color: '#F5C400' }}>REAL RESULTS.</span>
           </h2>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 16, color: '#666', maxWidth: 480, margin: '0 auto' }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 16, color: '#666', maxWidth: 480, margin: isMobile ? '0' : '0 auto' }}>
             No filters. No tricks. Just consistent training and expert guidance.
           </p>
-        </div>
+        </motion.div>
 
         {/* Filter bar */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginBottom: 48, flexWrap: 'wrap' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          viewport={{ once: true }}
+          style={{ display: 'flex', justifyContent: isMobile ? 'flex-start' : 'center', gap: 12, marginBottom: 48, flexWrap: 'wrap' }}
+        >
           {filters.map((f) => (
             <button
               key={f.value}
@@ -100,11 +88,11 @@ export default function Transformations() {
               style={{
                 fontFamily: "'Space Mono', monospace",
                 fontSize: 12,
-                padding: '10px 24px',
+                padding: '10px 20px',
                 border: `1px solid ${activeFilter === f.value ? '#F5C400' : '#333'}`,
                 background: activeFilter === f.value ? 'rgba(245, 196, 0, 0.08)' : 'transparent',
                 color: activeFilter === f.value ? '#F5C400' : '#666',
-                cursor: 'none',
+                cursor: isTouch ? 'pointer' : 'none',
                 borderRadius: 2,
                 transition: 'all 0.3s ease',
                 letterSpacing: '0.1em',
@@ -113,7 +101,7 @@ export default function Transformations() {
               {f.label}
             </button>
           ))}
-        </div>
+        </motion.div>
 
         {/* Cards grid */}
         <div
@@ -168,7 +156,7 @@ export default function Transformations() {
                       >
                         BEFORE
                       </span>
-                      <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 40, color: 'rgba(245,196,0,0.08)' }}>B</span>
+                      <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 40, color: 'rgba(245,196,0,0.08)', userSelect: 'none' }}>B</span>
                     </div>
                     {/* Divider */}
                     <div style={{ width: 2, background: '#F5C400', zIndex: 1 }} />
@@ -196,7 +184,7 @@ export default function Transformations() {
                       >
                         AFTER
                       </span>
-                      <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 40, color: 'rgba(245,196,0,0.15)' }}>A</span>
+                      <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 40, color: 'rgba(245,196,0,0.15)', userSelect: 'none' }}>A</span>
                     </div>
                   </div>
 
@@ -248,7 +236,13 @@ export default function Transformations() {
         </div>
 
         {/* CTA */}
-        <div style={{ textAlign: 'center', marginTop: 64 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          viewport={{ once: true }}
+          style={{ textAlign: isMobile ? 'left' : 'center', marginTop: 64 }}
+        >
           <p
             style={{
               fontFamily: "var(--font-body)",
@@ -259,10 +253,14 @@ export default function Transformations() {
           >
             Want to see more? 340+ members have transformed at NXT.
           </p>
-          <YellowButton variant="solid" href="https://wa.me/91XXXXXXXXXX">
+          <YellowButton
+            variant="solid"
+            href="https://wa.me/91XXXXXXXXXX"
+            style={isMobile ? { width: '100%', minHeight: 52, justifyContent: 'center' } : undefined}
+          >
             💬 START YOUR JOURNEY
           </YellowButton>
-        </div>
+        </motion.div>
       </div>
 
       <style jsx>{`

@@ -1,13 +1,10 @@
 'use client';
 
 import { useRef } from 'react';
-import { useGSAP } from '@gsap/react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { motion } from 'framer-motion';
+import { useDeviceAnimations } from '@/hooks/useDeviceAnimations';
 import SectionLabel from '@/components/ui/SectionLabel';
 import YellowButton from '@/components/ui/YellowButton';
-
-gsap.registerPlugin(ScrollTrigger);
 
 const plans = [
   {
@@ -36,13 +33,13 @@ const plans = [
   },
   {
     name: 'ANNUAL',
-    price: '₹18,999',
+    price: '₹8,999',
     period: '/year',
     features: ['Full gym access', 'Locker facility', 'Basic trainer guidance', 'Flexible timings', 'Progress tracking', 'Unlimited trainer sessions', 'Diet consultation', 'NXT branded gym kit'],
     cta: 'BOOK ON WHATSAPP',
     ctaVariant: 'outline' as const,
     popular: false,
-    original: '₹29,988',
+    original: '₹15,000',
     savings: 'SAVE 35%',
     whatsappPlan: 'Annual',
   },
@@ -50,38 +47,7 @@ const plans = [
 
 export default function Pricing() {
   const sectionRef = useRef<HTMLElement>(null);
-
-  useGSAP(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        '.pricing-header > *',
-        { y: 40, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          stagger: 0.1,
-          ease: 'power2.out',
-          scrollTrigger: { trigger: sectionRef.current, start: 'top 75%' },
-        }
-      );
-
-      gsap.fromTo(
-        '.pricing-card',
-        { y: 60, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          stagger: 0.15,
-          ease: 'power2.out',
-          scrollTrigger: { trigger: '.pricing-grid', start: 'top 80%' },
-        }
-      );
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, { scope: sectionRef });
+  const { isMobile } = useDeviceAnimations();
 
   return (
     <section
@@ -151,28 +117,35 @@ export default function Pricing() {
           className="pricing-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: 24,
+            gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+            gap: isMobile ? 16 : 24,
             alignItems: 'start',
             marginBottom: 48,
+            maxWidth: isMobile ? 500 : undefined,
+            marginLeft: isMobile ? 'auto' : undefined,
+            marginRight: isMobile ? 'auto' : undefined,
           }}
         >
           {plans.map((plan, i) => (
-            <div
+            <motion.div
               key={i}
-              className="pricing-card"
+              className={`pricing-card ${plan.popular && !isMobile ? 'glow-pulse' : ''}`}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
+              viewport={{ once: true }}
               style={{
                 background: plan.popular ? 'rgba(245, 196, 0, 0.04)' : '#1A1A1A',
                 border: plan.popular
                   ? '1px solid rgba(245, 196, 0, 0.4)'
                   : '1px solid rgba(245, 196, 0, 0.12)',
                 borderRadius: 2,
-                padding: '40px 32px',
+                padding: isMobile ? '32px 24px' : '40px 32px',
                 position: 'relative',
-                transform: plan.popular ? 'translateY(-20px)' : 'none',
+                transform: plan.popular && !isMobile ? 'translateY(-20px)' : 'none',
                 transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
-                ...(plan.popular
-                  ? { boxShadow: '0 0 40px rgba(245, 196, 0, 0.25), 0 0 80px rgba(245, 196, 0, 0.1)', animation: 'glowPulse 3s ease-in-out infinite' }
+                ...(plan.popular && !isMobile
+                  ? { boxShadow: '0 0 40px rgba(245, 196, 0, 0.25), 0 0 80px rgba(245, 196, 0, 0.1)' }
                   : {}),
               }}
             >
@@ -195,8 +168,10 @@ export default function Pricing() {
                 <span
                   style={{
                     position: 'absolute',
-                    top: 16,
-                    right: 16,
+                    top: isMobile ? -14 : 16,
+                    left: isMobile ? '50%' : undefined,
+                    right: isMobile ? undefined : 16,
+                    transform: isMobile ? 'translateX(-50%)' : 'none',
                     fontFamily: "'Space Mono', monospace",
                     fontSize: 10,
                     color: '#080808',
@@ -204,6 +179,7 @@ export default function Pricing() {
                     padding: '4px 12px',
                     borderRadius: 999,
                     letterSpacing: '0.08em',
+                    zIndex: 2,
                   }}
                 >
                   MOST POPULAR
@@ -297,10 +273,11 @@ export default function Pricing() {
                 variant={plan.ctaVariant}
                 href={`https://wa.me/91XXXXXXXXXX?text=Hi%2C%20I%27m%20interested%20in%20the%20${plan.whatsappPlan}%20membership%20at%20NXT%20Fitness%20Studio`}
                 className="w-full"
+                style={isMobile ? { width: '100%', minHeight: 52, justifyContent: 'center' } : undefined}
               >
                 {plan.popular ? '⚡ ' : '💬 '}{plan.cta}
               </YellowButton>
-            </div>
+            </motion.div>
           ))}
         </div>
 
@@ -340,19 +317,7 @@ export default function Pricing() {
         </p>
       </div>
 
-      <style jsx>{`
-        @media (max-width: 1024px) {
-          .pricing-grid {
-            grid-template-columns: 1fr !important;
-            max-width: 500px !important;
-            margin-left: auto !important;
-            margin-right: auto !important;
-          }
-          .pricing-card {
-            transform: none !important;
-          }
-        }
-      `}</style>
+
     </section>
   );
 }

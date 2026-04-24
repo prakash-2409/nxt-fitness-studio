@@ -1,13 +1,9 @@
 'use client';
 
-import { useRef } from 'react';
-import { useGSAP } from '@gsap/react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { motion } from 'framer-motion';
+import { useDeviceAnimations } from '@/hooks/useDeviceAnimations';
 import SectionLabel from '@/components/ui/SectionLabel';
 import YellowButton from '@/components/ui/YellowButton';
-
-gsap.registerPlugin(ScrollTrigger);
 
 const timings = [
   { day: 'Monday - Friday', hours: '6:00 AM - 10:00 PM' },
@@ -16,30 +12,10 @@ const timings = [
 ];
 
 export default function Location() {
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useGSAP(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        '.location-content > *',
-        { y: 30, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          stagger: 0.1,
-          ease: 'power2.out',
-          scrollTrigger: { trigger: sectionRef.current, start: 'top 80%' },
-        }
-      );
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, { scope: sectionRef });
+  const { isMobile } = useDeviceAnimations();
 
   return (
     <section
-      ref={sectionRef}
       id="contact"
       style={{
         padding: 'clamp(80px, 10vw, 140px) 0',
@@ -68,12 +44,16 @@ export default function Location() {
           className="location-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
+            gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
             gap: 48,
           }}
         >
           {/* Map */}
-          <div
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
             style={{
               border: '2px solid rgba(245, 196, 0, 0.2)',
               overflow: 'hidden',
@@ -95,10 +75,16 @@ export default function Location() {
               referrerPolicy="no-referrer-when-downgrade"
               title="NXT Fitness Studio Location"
             />
-          </div>
+          </motion.div>
 
           {/* Contact details */}
-          <div className="location-content">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            viewport={{ once: true }}
+            className="location-content"
+          >
             {/* Address */}
             <div style={{ display: 'flex', gap: 16, marginBottom: 32 }}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F5C400" strokeWidth="2" style={{ flexShrink: 0, marginTop: 2 }}>
@@ -173,25 +159,17 @@ export default function Location() {
             </div>
 
             {/* CTAs */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <YellowButton variant="outline" href="tel:+91XXXXXXXXXX">
+            <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 12 }}>
+              <YellowButton variant="outline" href="tel:+91XXXXXXXXXX" style={isMobile ? { width: '100%', justifyContent: 'center' } : undefined}>
                 📞 CALL NOW
               </YellowButton>
-              <YellowButton variant="solid" href="https://wa.me/91XXXXXXXXXX">
+              <YellowButton variant="solid" href="https://wa.me/91XXXXXXXXXX" style={isMobile ? { width: '100%', justifyContent: 'center' } : undefined}>
                 💬 CHAT ON WHATSAPP
               </YellowButton>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
-
-      <style jsx>{`
-        @media (max-width: 768px) {
-          .location-grid {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
     </section>
   );
 }

@@ -11,6 +11,7 @@ interface YellowButtonProps {
   icon?: ReactNode;
   size?: 'default' | 'small';
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export default function YellowButton({
@@ -21,6 +22,7 @@ export default function YellowButton({
   icon,
   size = 'default',
   className = '',
+  style,
 }: YellowButtonProps) {
   const buttonRef = useRef<HTMLButtonElement | HTMLAnchorElement>(null);
   const magnetRef = useRef({ x: 0, y: 0 });
@@ -105,7 +107,7 @@ export default function YellowButton({
         href={href}
         target={href.startsWith('http') || href.startsWith('wa.me') ? '_blank' : undefined}
         rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
-        style={baseStyles}
+        style={{ ...baseStyles, ...style }}
         className={`yellow-button cursor-hover ${className}`}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
@@ -119,7 +121,7 @@ export default function YellowButton({
   return (
     <button
       ref={buttonRef as React.RefObject<HTMLButtonElement>}
-      style={baseStyles}
+      style={{ ...baseStyles, ...style }}
       className={`yellow-button cursor-hover ${className}`}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}

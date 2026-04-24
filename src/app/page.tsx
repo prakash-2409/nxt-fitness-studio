@@ -1,21 +1,24 @@
 'use client';
 
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import Preloader from '@/components/sections/Preloader';
 import Hero from '@/components/sections/Hero';
-import StatsBar from '@/components/sections/StatsBar';
-import About from '@/components/sections/About';
-import Programs from '@/components/sections/Programs';
-import Trainers from '@/components/sections/Trainers';
-import Transformations from '@/components/sections/Transformations';
-import Reviews from '@/components/sections/Reviews';
-import InstagramFeed from '@/components/sections/InstagramFeed';
-import Pricing from '@/components/sections/Pricing';
-import FAQ from '@/components/sections/FAQ';
-import Location from '@/components/sections/Location';
 import Navigation from '@/components/layout/Navigation';
-import Footer from '@/components/layout/Footer';
-import MobileCTABar from '@/components/ui/MobileCTABar';
+
+// Dynamic imports for below-fold sections (code-splitting for performance)
+const StatsBar = dynamic(() => import('@/components/sections/StatsBar'));
+const About = dynamic(() => import('@/components/sections/About'));
+const Programs = dynamic(() => import('@/components/sections/Programs'));
+const Trainers = dynamic(() => import('@/components/sections/Trainers'));
+const Transformations = dynamic(() => import('@/components/sections/Transformations'));
+const Reviews = dynamic(() => import('@/components/sections/Reviews'));
+const InstagramFeed = dynamic(() => import('@/components/sections/InstagramFeed'));
+const Pricing = dynamic(() => import('@/components/sections/Pricing'));
+const FAQ = dynamic(() => import('@/components/sections/FAQ'));
+const Location = dynamic(() => import('@/components/sections/Location'));
+const Footer = dynamic(() => import('@/components/layout/Footer'));
+const MobileCTABar = dynamic(() => import('@/components/ui/MobileCTABar'));
 
 export default function Home() {
   const [preloaderDone, setPreloaderDone] = useState(false);

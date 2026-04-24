@@ -45,6 +45,7 @@ export default function MarqueeStrip({
           whiteSpace: 'nowrap',
           animation: `${reverse ? 'marquee-reverse' : 'marquee'} ${duration} linear infinite`,
           gap: 0,
+          willChange: 'transform',
         }}
       >
         {repeatedContent.map((item, i) => (
