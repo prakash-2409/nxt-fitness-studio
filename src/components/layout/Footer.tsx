@@ -241,9 +241,10 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div
+        className="footer-bottom"
         style={{
           borderTop: '1px solid #1A1A1A',
-          padding: '20px clamp(20px, 5vw, 80px)',
+          padding: '20px clamp(20px, 5vw, 80px) 80px',
           maxWidth: 1400,
           margin: '0 auto',
           display: 'flex',
@@ -260,6 +261,14 @@ export default function Footer() {
           BUILT WITH ⚡
         </span>
       </div>
+
+      <style jsx>{`
+        @media (min-width: 769px) {
+          .footer-bottom {
+            padding-bottom: 20px !important;
+          }
+        }
+      `}</style>
     </footer>
   );
 }

@@ -1,8 +1,12 @@
 'use client';
 
-import { useRef, useCallback } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useDeviceAnimations } from '@/hooks/useDeviceAnimations';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface PreloaderProps {
   onComplete: () => void;
@@ -11,12 +15,25 @@ interface PreloaderProps {
 export default function Preloader({ onComplete }: PreloaderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
+  const { animConfig } = useDeviceAnimations();
 
   const handleComplete = useCallback(() => {
     onComplete();
   }, [onComplete]);
 
+  // Skip preloader on mobile
+  useEffect(() => {
+    if (!animConfig.enablePreloader) {
+      handleComplete();
+      if (containerRef.current) {
+        containerRef.current.style.display = 'none';
+      }
+    }
+  }, [animConfig.enablePreloader, handleComplete]);
+
   useGSAP(() => {
+    if (!animConfig.enablePreloader) return;
+
     const tl = gsap.timeline({
       onComplete: () => {
         handleComplete();
@@ -83,7 +100,10 @@ export default function Preloader({ onComplete }: PreloaderProps) {
       },
       3.0
     );
-  }, { scope: containerRef });
+  }, { scope: containerRef, dependencies: [animConfig.enablePreloader] });
+
+  // Don't render on mobile
+  if (!animConfig.enablePreloader) return null;
 
   const studioText = 'NXT FITNESS STUDIO';
 
@@ -140,19 +160,14 @@ export default function Preloader({ onComplete }: PreloaderProps) {
           marginBottom: 40,
         }}
       >
-        {/* Bodybuilder silhouette */}
         <svg
           className="preloader-icon"
           width="60"
           height="60"
           viewBox="0 0 60 60"
           fill="none"
-          style={{
-            transform: 'rotate(-45deg)',
-            opacity: 0,
-          }}
+          style={{ transform: 'rotate(-45deg)', opacity: 0 }}
         >
-          {/* Muscular figure with arms raised */}
           <path
             d="M30 8C32.2 8 34 9.8 34 12C34 14.2 32.2 16 30 16C27.8 16 26 14.2 26 12C26 9.8 27.8 8 30 8Z"
             fill="#080808"
@@ -161,14 +176,8 @@ export default function Preloader({ onComplete }: PreloaderProps) {
             d="M20 22L24 18H36L40 22L44 20L46 24L42 26L38 24V30L42 38V50H36V40L30 34L24 40V50H18V38L22 30V24L18 26L14 24L16 20L20 22Z"
             fill="#080808"
           />
-          <path
-            d="M12 20L16 18L20 22L16 24L12 20Z"
-            fill="#080808"
-          />
-          <path
-            d="M48 20L44 18L40 22L44 24L48 20Z"
-            fill="#080808"
-          />
+          <path d="M12 20L16 18L20 22L16 24L12 20Z" fill="#080808" />
+          <path d="M48 20L44 18L40 22L44 24L48 20Z" fill="#080808" />
         </svg>
       </div>
 

@@ -1,11 +1,8 @@
 'use client';
 
-import { useRef } from 'react';
-import { useGSAP } from '@gsap/react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
+import { useRef, useState, useEffect, useCallback } from 'react';
+import { motion } from 'framer-motion';
+import SectionLabel from '@/components/ui/SectionLabel';
 
 const stats = [
   { value: 340, suffix: '+', label: 'ACTIVE MEMBERS' },
@@ -14,77 +11,116 @@ const stats = [
   { value: 3, suffix: '+', label: 'YEARS RUNNING' },
 ];
 
-export default function StatsBar() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const numberRefs = useRef<(HTMLSpanElement | null)[]>([]);
+function useCounter(target: number, shouldFormat: boolean, inView: boolean) {
+  const [count, setCount] = useState(0);
+  const hasAnimated = useRef(false);
 
-  useGSAP(() => {
-    const ctx = gsap.context(() => {
-      // Fade in the entire bar
-      gsap.fromTo(
-        sectionRef.current,
-        { y: 30, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 85%',
-          },
+  useEffect(() => {
+    if (!inView || hasAnimated.current) return;
+    hasAnimated.current = true;
+
+    let start = 0;
+    const totalFrames = 60;
+    const increment = target / totalFrames;
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= target) {
+        setCount(target);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, 25);
+
+    return () => clearInterval(timer);
+  }, [inView, target]);
+
+  const display = shouldFormat ? count.toLocaleString() : count.toString();
+  return display;
+}
+
+function StatItem({ stat, index }: { stat: typeof stats[0]; index: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
         }
-      );
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
-      // Counter animations
-      stats.forEach((stat, i) => {
-        const el = numberRefs.current[i];
-        if (!el) return;
-
-        const obj = { val: 0 };
-        gsap.to(obj, {
-          val: stat.value,
-          duration: 2,
-          ease: 'expo.out',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 85%',
-          },
-          onUpdate: () => {
-            const num = Math.round(obj.val);
-            el.textContent = stat.format
-              ? num.toLocaleString()
-              : num.toString();
-          },
-        });
-
-        // Suffix scale-in after count
-        if (stat.suffix) {
-          gsap.fromTo(
-            `.stat-suffix-${i}`,
-            { scale: 0, opacity: 0 },
-            {
-              scale: 1,
-              opacity: 1,
-              duration: 0.4,
-              ease: 'back.out(2)',
-              delay: 2,
-              scrollTrigger: {
-                trigger: sectionRef.current,
-                start: 'top 85%',
-              },
-            }
-          );
-        }
-      });
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, { scope: sectionRef });
+  const display = useCounter(stat.value, !!stat.format, inView);
 
   return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.1, ease: 'easeOut' }}
+      viewport={{ once: true, margin: '-50px' }}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        textAlign: 'center',
+        padding: '20px 8px',
+        position: 'relative',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'baseline' }}>
+        <span
+          style={{
+            fontFamily: "'Bebas Neue', sans-serif",
+            fontSize: 'clamp(40px, 5vw, 72px)',
+            color: '#F5C400',
+            lineHeight: 1,
+          }}
+        >
+          {display}
+        </span>
+        {stat.suffix && (
+          <span
+            style={{
+              fontFamily: "'Bebas Neue', sans-serif",
+              fontSize: 'clamp(24px, 3vw, 40px)',
+              color: '#F5C400',
+            }}
+          >
+            {stat.suffix}
+          </span>
+        )}
+      </div>
+      <span
+        style={{
+          fontFamily: "'Space Mono', monospace",
+          fontSize: 'clamp(9px, 1.2vw, 11px)',
+          letterSpacing: '0.2em',
+          color: '#555555',
+          textTransform: 'uppercase',
+          marginTop: 8,
+        }}
+      >
+        {stat.label}
+      </span>
+    </motion.div>
+  );
+}
+
+export default function StatsBar() {
+  return (
     <section
-      ref={sectionRef}
+      aria-label="Statistics"
       style={{
         width: '100%',
         background: '#0F0F0F',
@@ -94,9 +130,9 @@ export default function StatsBar() {
         overflow: 'hidden',
       }}
     >
-      {/* Warning stripes on edges */}
+      {/* Warning stripes on edges — desktop only */}
       <div
-        className="warning-stripes"
+        className="warning-stripes stats-stripe-left"
         style={{
           position: 'absolute',
           left: 0,
@@ -109,7 +145,7 @@ export default function StatsBar() {
         }}
       />
       <div
-        className="warning-stripes"
+        className="warning-stripes stats-stripe-right"
         style={{
           position: 'absolute',
           right: 0,
@@ -122,94 +158,42 @@ export default function StatsBar() {
         }}
       />
 
+      <div style={{ marginBottom: 8, paddingTop: 16, paddingLeft: 'clamp(20px, 5vw, 80px)' }}>
+        <SectionLabel index="01" label="STATS" />
+      </div>
+
       <div
+        className="stats-grid"
         style={{
           maxWidth: 1400,
           margin: '0 auto',
-          padding: '40px clamp(20px, 5vw, 80px)',
+          padding: '16px clamp(20px, 5vw, 80px) 40px',
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
           gap: 0,
           alignItems: 'center',
         }}
-        className="stats-grid"
       >
         {stats.map((stat, i) => (
-          <div
-            key={i}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              textAlign: 'center',
-              padding: '20px 0',
-              position: 'relative',
-            }}
-          >
-            {/* Diagonal slash divider (not on first) */}
-            {i > 0 && (
-              <div
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  top: '50%',
-                  transform: 'translateY(-50%) rotate(20deg)',
-                  width: 1,
-                  height: 60,
-                  background: '#333',
-                }}
-              />
-            )}
-
-            <div style={{ display: 'flex', alignItems: 'baseline' }}>
-              <span
-                ref={(el) => { numberRefs.current[i] = el; }}
-                style={{
-                  fontFamily: "'Bebas Neue', sans-serif",
-                  fontSize: 'clamp(40px, 5vw, 64px)',
-                  color: '#F5C400',
-                  lineHeight: 1,
-                }}
-              >
-                0
-              </span>
-              {stat.suffix && (
-                <span
-                  className={`stat-suffix-${i}`}
-                  style={{
-                    fontFamily: "'Bebas Neue', sans-serif",
-                    fontSize: 'clamp(28px, 3vw, 40px)',
-                    color: '#F5C400',
-                    opacity: 0,
-                    display: 'inline-block',
-                  }}
-                >
-                  {stat.suffix}
-                </span>
-              )}
-            </div>
-
-            <span
-              style={{
-                fontFamily: "'Space Mono', monospace",
-                fontSize: 11,
-                letterSpacing: '0.2em',
-                color: '#555555',
-                textTransform: 'uppercase',
-                marginTop: 8,
-              }}
-            >
-              {stat.label}
-            </span>
-          </div>
+          <StatItem key={i} stat={stat} index={i} />
         ))}
       </div>
 
       <style jsx>{`
-        @media (max-width: 768px) {
+        @media (max-width: 767px) {
           .stats-grid {
             grid-template-columns: repeat(2, 1fr) !important;
-            gap: 24px !important;
+            gap: 0 !important;
+          }
+          .stats-stripe-left,
+          .stats-stripe-right {
+            display: none !important;
+          }
+        }
+        @media (max-width: 479px) {
+          .stats-grid {
+            padding-left: 16px !important;
+            padding-right: 16px !important;
           }
         }
       `}</style>

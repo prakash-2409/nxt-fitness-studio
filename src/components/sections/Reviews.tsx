@@ -1,13 +1,9 @@
 'use client';
 
-import { useRef } from 'react';
-import { useGSAP } from '@gsap/react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { motion } from 'framer-motion';
+import { useDeviceAnimations } from '@/hooks/useDeviceAnimations';
 import SectionLabel from '@/components/ui/SectionLabel';
 import GlassCard from '@/components/ui/GlassCard';
-
-gsap.registerPlugin(ScrollTrigger);
 
 const reviews = [
   { name: 'Aditya R.', stars: 5, text: 'Best gym in Chennai. Trainers actually care about your progress. Transformed in 3 months flat.', date: '2 weeks ago' },
@@ -21,33 +17,13 @@ const reviews = [
 ];
 
 export default function Reviews() {
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useGSAP(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        '.reviews-header > *',
-        { y: 30, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          stagger: 0.1,
-          ease: 'power2.out',
-          scrollTrigger: { trigger: sectionRef.current, start: 'top 80%' },
-        }
-      );
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, { scope: sectionRef });
-
+  const { isMobile } = useDeviceAnimations();
   const row1 = reviews.slice(0, 4);
   const row2 = reviews.slice(4, 8);
 
   return (
     <section
-      ref={sectionRef}
+      id="reviews"
       style={{
         padding: '80px 0',
         background: '#0A0A0A',
@@ -55,7 +31,14 @@ export default function Reviews() {
       }}
     >
       {/* Header */}
-      <div className="reviews-header section-container" style={{ textAlign: 'center', marginBottom: 48 }}>
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        viewport={{ once: true }}
+        className="reviews-header section-container"
+        style={{ textAlign: 'center', marginBottom: 48 }}
+      >
         <div style={{ marginBottom: 24 }}>
           <SectionLabel index="05" label="WHAT MEMBERS SAY" />
         </div>
@@ -84,11 +67,12 @@ export default function Reviews() {
             4.9 ★ on Google Reviews
           </span>
         </div>
-      </div>
+      </motion.div>
 
       {/* Row 1 — moves left */}
       <div className="review-row" style={{ marginBottom: 16 }}>
         <div
+          className="reviews-row"
           style={{
             display: 'flex',
             gap: 16,
@@ -105,6 +89,7 @@ export default function Reviews() {
       {/* Row 2 — moves right */}
       <div className="review-row">
         <div
+          className="reviews-row"
           style={{
             display: 'flex',
             gap: 16,

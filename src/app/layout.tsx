@@ -32,13 +32,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "xyz Fitness Studio | Chennai's #1 Private Gym",
+  title: "NXT Fitness Studio | Chennai's #1 Private Gym",
   description:
     "Train harder. Get results. NXT Fitness Studio is Chennai's most serious private training studio with expert coaches, premium equipment, and proven transformation programs.",
   keywords:
     "gym Chennai, private gym Chennai, personal trainer Chennai, fitness studio Chennai, weight loss Chennai, NXT Fitness",
   openGraph: {
-    title: "xyz Fitness Studio | Chennai's Premier Private Gym",
+    title: "NXT Fitness Studio | Chennai's Premier Private Gym",
     description:
       "Train at Chennai's most serious private gym. Expert coaches, premium equipment, proven transformations.",
     url: "https://www.nxtfitnessstudio.com",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "xyz Fitness Studio | Chennai's #1 Private Gym",
+    title: "NXT Fitness Studio | Chennai's #1 Private Gym",
     description:
       "Chennai's most serious private training studio. Expert coaches, premium equipment, proven results.",
   },
@@ -70,6 +70,9 @@ export default function RootLayout({
     >
       <head>
         <link rel="canonical" href="https://www.nxtfitnessstudio.com" />
+        <link rel="dns-prefetch" href="https://wa.me" />
+        <meta name="theme-color" content="#080808" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
       </head>
       <body
         style={{
